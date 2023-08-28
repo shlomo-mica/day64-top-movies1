@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/form.html' import render_form,render_nav_item,render_form_row %}
+{% import "bootstrap/form.html" as wtf %}
+
+wtf.render_form()
+
+{% block title %}Edit Movies{% endblock %}
+
+{% block content %}
+<div class="content">
+  <h1 class="heading">Movie Title</h1>
+    <p class="description">Edit Movie Rating</p>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-md-1 col-md-8">
+        <form action="{{url_for('rate_db',rate_val=68.8)}}" method="GET">
+           {{ form.csrf_token() }}
+            {{ render_form_row([form.rate_value]) }}
+            {{ render_form_row([form.impression]) }}
+            {{ render_form_row([form.change_value]) }}
+        </form>
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+

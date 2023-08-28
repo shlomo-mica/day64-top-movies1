@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}My Top 10 Movies{% endblock %}
+
+{% block content %}
+<div class="container" xmlns:https="http://www.w3.org/1999/xhtml">
+  <h1 class="heading">My Top 10 Movies</h1>
+  <p class="description">These are my all-time favourite movies.</p>
+   
+  <div class="card" >
+        <div class="front"  style='background-image: url({{ movies.img_url }}'>
+      <!--        https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.themoviedb.org%2Fmovie%2F1817-phone-booth%2Fimages%2Fposters&psig=AOvVaw1N3D_XA_Q1C7rC-1oXGW6w&ust=1692693866609000&source=images&cd=vfe&opi=89978449&ved=0CA4QjRxqFwoTCLDm6qKu7YADFQAAAAAdAAAAABAE-->
+      <!--    <div class="front" style="background-image: url('https://www.shortlist.com/media/images/2019/05/the-30-coolest-alternative-movie-posters-ever-2-1556670563-K61a-column-width-inline.jpg');">-->
+        <p class="large">1</p>
+    </div>
+    <div class="back">
+      <div>
+    <div class="title">{{ movies.title }} <span class="release_date">( {{movies.year }})</span></div>
+        <div class="rating">
+            <label>{{ movies.rating }}</label>
+          <i class="fas fa-star star"></i>
+        </div>
+          <p class="review">{{ movies.review }}</p>
+        <p class="overview">
+            {{ movies.description }}        </p>
+
+        <a href="{{ url_for('change_rate',b_name='jj') }}" class="button">Update</a>
+        <a href="templates/edit.html" class="button delete-button">Delete</a>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container text-center add">
+<a href="#" class="button">Add Movie</a>
+</div>
+
+{% endblock %}
