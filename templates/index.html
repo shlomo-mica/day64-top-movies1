@@ -22,17 +22,18 @@
         </div>
           <p class="review">{{ movies.review }}</p>
         <p class="overview">
-            {{ movies.description }}        </p>
+            {{ movies.description }}      </p>
 
         <a href="{{ url_for('change_rate',b_name='jj') }}" class="button">Update</a>
-        <a href="templates/edit.html" class="button delete-button">Delete</a>
+        <a href="{{ url_for('delete_now') }}" class="button delete-button">Delete</a>
 
       </div>
     </div>
   </div>
 </div>
 <div class="container text-center add">
-<a href="#" class="button">Add Movie</a>
+<a href="{{ url_for('add') }}" class="button">Add Movie</a>
+   <h3>{{ movies.id }}</h3>
 </div>
 
 {% endblock %}

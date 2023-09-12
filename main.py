@@ -30,7 +30,7 @@ class Update_rate(FlaskForm):
     change_value = SubmitField(label='Change')
 
 
-# create table
+# create table define classes
 class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(250), unique=True, nullable=False)
@@ -41,6 +41,17 @@ class Movie(db.Model):
     review = db.Column(db.String(250), nullable=True)
     img_url = db.Column(db.String(250), nullable=False)
 
+
+jhon = Movie(title="jaws", year=2011,
+             description='When a killer shark unleashes chaos on a beach community off Cape Cod',
+             # it's up to a local sheriff, a marine biologist,
+             #  and an old seafarer to hunt the beast down')
+             rating=9, ranking='4 stars', review='very good', img_url="")
+
+
+# with app.app_context():
+# db.session.add(jhon  ?.MNV 342356789#
+# db.session.commit
 
 class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -55,30 +66,123 @@ with app.app_context():
 with app.app_context():
     result = db.session.execute(db.select(Book).order_by(Book.title))
     all_books = result.scalars()
-    print(all_books.first().title)
+    print(all_books.first().author)
 
 #   FLASK TRANSFER TO HTML PAGE
 with app.app_context():
     movie1 = db.session.execute((db.select(Movie).where(Movie.title == "Avatar The Way of Water"))).scalar()
     movie2 = db.session.execute((db.select(Movie).where(Movie.title == "Phone Boot"))).scalar()
     book1 = db.session.execute(db.select(Book).where(Book.title == "Harry Potter")).scalar()
+    a = movie1.img_url
+
+    print(a)
+
+
+def connect_to_data_base(m_name):
+    url_query = f'https://api.themoviedb.org/3/search/movie?query={m_name}'  # &callback=test
+
+    url_jack = f'https://api.themoviedb.org/3/search/movie?query=Jack+Reacher&api_key=4c06ee924f273bf05a13ca12ada916a3'
+    header_query = {"accept": "application/json",
+                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0YzA2ZWU5MjRmMjczYmYwNWExM2NhMTJhZGE5MTZhMyIsInN1YiI6IjY0ZjFlMDY4ZTBjYTdmMDBjYmU1MDZmNyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.S8_4wPKkGLL_YjRHIejiGxbXmqrl-n_DzVjg-4S5aYo"}
+    multistories = requests.get(url_query, headers=header_query)
+    list1 = (multistories.json())
+    print(list1)
+
+    # for i in list1['results']:
+    #     print(i['id'])
+    #     print(i['original_title'])
+    #     print(i['release_date'])
+    #     print(i['overview'])
+    #     # 'poster_path': '/la0eOA49YtQfffTwQFFFVIJCh5u.jpg'
+    data_details = list1['results']
+
+    return data_details
+
+
+@app.route('/insert_favorite_to database/<title1>-<desc1>-<date1>-<rating1>-<vote_count1>')
+def insert_db(title1, date1, desc1, rating1, vote_count1):
+    rating_float = float(rating1)
+    ranking = int(vote_count1)
+    print(type(date1))
+    print(date1)
+
+    new_movie = Movie(title=title1,
+                      description=desc1,
+                      rating=rating_float,
+                      ranking=ranking)
+                     # img_url=poster_path1)
+
+    #print("poster_path,", poster_path1)
+
+    # 'poster_path': '/2JhwA8uxxb5ZKjMH6eDHLuJLVUw.jpg'
+    # with app.app_context():
+    #     db.session.add(new_movie)
+    #     db.session.commit()
+
+
+    print(title1)
+    print("********************")
+    print(date1)
+   # print(desc1)
+
+    return render_template("select.html")
+
+
+@app.route('/add_movie', methods=['GET', 'POST'])
+def add():
+    if request.method == "POST":
+        data = request.form
+        form_add_name = data.get("film_name")
+        print(form_add_name)
+        mov = (connect_to_data_base(form_add_name))
+        return render_template("select.html", TMDB=mov)
+    else:
+        message = 'Movie not in our data base'
+        print(message)
+        return render_template("add.html", nofile=message)
+
+
+@app.route('/delete')
+def delete_now():
+    # Fetch the row you want to delete
+    user_to_delete = Movie.query.filter_by(id=1).first()
+
+    # Check if the user exists
+    if user_to_delete:
+        # Delete the user
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        return "User deleted successfully."
+    else:
+        return "User not found."
 
 
 # UPDATE ONE OBJECT ROW(MOVIE) <class '__main__.Movie'>
-@app.route('/db-rate-update/<float:rate_val>')
-def rate_db(rate_val):
+# /<float:rate_val>
+@app.route('/db-rate-update', methods=['GET', 'POST'])
+def rate_db():
+    global rate_value, impression
+    if request.method == 'POST':
+        rate_value = request.form.get('rate_value')
+        impression = request.form.get('impression')
+        print('rate Value:', rate_value)
+        print(('impression=', impression))
+
     with app.app_context():
         film = db.session.query(Movie).filter_by(title='Avatar The Way of Water').first()
         print(film.rating, film.id)
-        print(rate_val)
-        film.rating = rate_val  # change rating
+        film.rating = rate_value  # change rating
+        film.review = impression
         db.session.commit()
-    return "DBASE DONE"
+
+        print("DBASE DONE")
+    return "OK"
 
 
 @app.route("/")
 def home():
     films = db.session.execute(db.select(Movie).order_by(Movie.title)).scalars()
+
     var_id = films.all()[0].id
     print("test", var_id)
     for item in films.all():

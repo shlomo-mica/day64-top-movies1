@@ -5,9 +5,22 @@
 {% block content %}
 <div class="container">
     <h1 class="heading">Select Movie</h1>
-  <p>
+
+       <ul>
+        {% for item in TMDB %}
+<!--        <li><h4>{ item['movie_print'}<a href="{{url_for('add')}}"> Change Rating22</a></h4></li>-->
+            <li><h5><a href="{{url_for('insert_db',title1=item['original_title']
+            ,desc1=item['overview'],date1=item['release_date'],
+            rating1=item['vote_average'],vote_count1=item['vote_count'],
+            )}}">
+                {{item['original_title'],item['release_date']}}</a></h5></li>
+        {% endfor %}
+
+
+      </ul>
+
     <a href="#"> MOVIE TITLE - MOVIE RELEASE DATE</a>
-  </p>
+
 
 </div>
 {% endblock %}
