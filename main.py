@@ -7,6 +7,7 @@ from wtforms import StringField, SubmitField, IntegerField, TextAreaField, Radio
 from wtforms.validators import DataRequired, InputRequired, Length
 from sqlalchemy import update
 import requests
+from sqlalchemy.engine.result import ScalarResult
 
 db = SQLAlchemy()
 app = Flask(__name__)
@@ -46,7 +47,8 @@ jhon = Movie(title="jaws", year=2011,
              description='When a killer shark unleashes chaos on a beach community off Cape Cod',
              # it's up to a local sheriff, a marine biologist,
              #  and an old seafarer to hunt the beast down')
-             rating=9, ranking='4 stars', review='very good', img_url="")
+             rating=9, ranking='4 stars', review='very good',
+             img_url="https://th.bing.com/th/id/OIP.Uqbg8JOaiDfQeNgpUA2hyQAAAA?pid=ImgDet&w=440&h=660&rs=1")
 
 
 # with app.app_context():
@@ -67,26 +69,34 @@ with app.app_context():
     result = db.session.execute(db.select(Book).order_by(Book.title))
     all_books = result.scalars()
     print(all_books.first().author)
-
+    query = db.session.query(Movie)
+    list_of_all_movies = query.all()  # home routh use this list
+    # print(a[1].img_url)
+    # for row in a:
+    #     print(row)
 #   FLASK TRANSFER TO HTML PAGE
 with app.app_context():
-    movie1 = db.session.execute((db.select(Movie).where(Movie.title == "Avatar The Way of Water"))).scalar()
-    movie2 = db.session.execute((db.select(Movie).where(Movie.title == "Phone Boot"))).scalar()
+    movie1 = db.session.execute((db.select(Movie).where(Movie.id == 1))).scalar()
+    movie2 = db.session.execute((db.select(Movie).where(Movie.id == 2))).scalar()
     book1 = db.session.execute(db.select(Book).where(Book.title == "Harry Potter")).scalar()
-    a = movie1.img_url
-
-    print(a)
+    b = movie1.img_url
+    print(b)
+    moooov_exe = Movie.query.all()
 
 
 def connect_to_data_base(m_name):
-    url_query = f'https://api.themoviedb.org/3/search/movie?query={m_name}'  # &callback=test
+    url_query = f'https://api.themoviedb.org/3/search/movie?query={m_name}'
+    # f'  # &callback=test' \
 
     url_jack = f'https://api.themoviedb.org/3/search/movie?query=Jack+Reacher&api_key=4c06ee924f273bf05a13ca12ada916a3'
     header_query = {"accept": "application/json",
                     "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0YzA2ZWU5MjRmMjczYmYwNWExM2NhMTJhZGE5MTZhMyIsInN1YiI6IjY0ZjFlMDY4ZTBjYTdmMDBjYmU1MDZmNyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.S8_4wPKkGLL_YjRHIejiGxbXmqrl-n_DzVjg-4S5aYo"}
+    response = requests.get(url_query, params={"api_key": '4c06ee924f273bf05a13ca12ada916a3', "query": 'shark'})
+    data = response.json()["results"]
     multistories = requests.get(url_query, headers=header_query)
     list1 = (multistories.json())
-    print(list1)
+    print(list1['results'])
+    print('data', data)
 
     # for i in list1['results']:
     #     print(i['id'])
@@ -100,7 +110,7 @@ def connect_to_data_base(m_name):
 
 
 @app.route('/insert_favorite_to database/<title1>-<desc1>-<date1>-<rating1>-<vote_count1>')
-def insert_db(title1, date1, desc1, rating1, vote_count1):
+def insert_db(title1, desc1, date1, rating1, vote_count1):
     rating_float = float(rating1)
     ranking = int(vote_count1)
     print(type(date1))
@@ -110,20 +120,19 @@ def insert_db(title1, date1, desc1, rating1, vote_count1):
                       description=desc1,
                       rating=rating_float,
                       ranking=ranking)
-                     # img_url=poster_path1)
+    # img_url=poster_path1)
 
-    #print("poster_path,", poster_path1)
+    # print("poster_path,", poster_path1)
 
     # 'poster_path': '/2JhwA8uxxb5ZKjMH6eDHLuJLVUw.jpg'
-    # with app.app_context():
-    #     db.session.add(new_movie)
-    #     db.session.commit()
-
+    with app.app_context():
+        db.session.add(new_movie)
+        db.session.commit()
 
     print(title1)
     print("********************")
     print(date1)
-   # print(desc1)
+    # print(desc1)
 
     return render_template("select.html")
 
@@ -145,7 +154,7 @@ def add():
 @app.route('/delete')
 def delete_now():
     # Fetch the row you want to delete
-    user_to_delete = Movie.query.filter_by(id=1).first()
+    user_to_delete = Movie.query.filter_by(id=13).first()
 
     # Check if the user exists
     if user_to_delete:
@@ -161,7 +170,7 @@ def delete_now():
 # /<float:rate_val>
 @app.route('/db-rate-update', methods=['GET', 'POST'])
 def rate_db():
-    global rate_value, impression
+    global rate_value, impression, b_name
     if request.method == 'POST':
         rate_value = request.form.get('rate_value')
         impression = request.form.get('impression')
@@ -169,7 +178,7 @@ def rate_db():
         print(('impression=', impression))
 
     with app.app_context():
-        film = db.session.query(Movie).filter_by(title='Avatar The Way of Water').first()
+        film = db.session.query(Movie).filter_by(id=3).first()
         print(film.rating, film.id)
         film.rating = rate_value  # change rating
         film.review = impression
@@ -182,14 +191,12 @@ def rate_db():
 @app.route("/")
 def home():
     films = db.session.execute(db.select(Movie).order_by(Movie.title)).scalars()
-
-    var_id = films.all()[0].id
-    print("test", var_id)
-    for item in films.all():
-        print(item.title)
-        # print(films.all()[0])
-
-    return render_template("index.html", movies=movie1, films=films, id=var_id)
+    var_id = films.all()[2].rating
+    print(var_id)
+    movies = [movie1, movie2]
+    # for item in films:
+    #     print("title", item.title)
+    return render_template("index.html", movies=list_of_all_movies, films=films, id=var_id)
 
 
 @app.route('/update_rate/<b_name>')
@@ -197,13 +204,24 @@ def change_rate(b_name):
     # a=request.form.get("")
     # print(a.title())
     # print(id_now)
-    impression = Update_rate.impression
-    rate = Update_rate.rate_value
+    # impression = Update_rate.impression
+    # rate = Update_rate.rate_value
+    # movie_id = Movie.id
     form = Update_rate()
-    movie_id = Movie.id
-    print(b_name)
 
-    return render_template("edit.html", form=form, rate=rate, impression=impression, id=movie_id)
+    print("bname=", b_name)
+
+    return render_template("edit.html", form=form, b_name=b_name)
+
+
+@app.route('/divs')
+def generate_divs():
+    movie1 = db.session.execute((db.select(Movie).where(Movie.id == 1))).scalar()
+    # Define a list of variables
+    variables = ["Variable 1", "Variable 2", "Variable 3"]
+
+    # Pass the variables list to the template
+    return render_template('index.html', variables=variables)
 
 
 if __name__ == '__main__':

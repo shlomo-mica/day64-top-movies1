@@ -5,5 +5,22 @@
 {% block content %}
 <div class="content">
     <h1 class="heading">Add a Movie</h1>
+    <form action={{url_for('add')}} method="POST">
+        <label >Movies List </label>
+        <input type="text" id="film_name" name="film_name"  maxlength="88" size="20" />
+        <input type="submit" value="search_add"/>
+
+   </form>
+     <ul>
+        {% for item in TMDB %}
+<!--        <li><h4>{ item['movie_print'}<a href="{{url_for('add')}}"> Change Rating22</a></h4></li>-->
+            <li><h5><a href="{{url_for('add')}}">{{item['original_title']}}</a></h5></li>
+        {% endfor %}
+
+
+      </ul>
+
+
 </div>
 {% endblock %}
+
