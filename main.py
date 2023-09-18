@@ -43,6 +43,7 @@ class Movie(db.Model):
     img_url = db.Column(db.String(250), nullable=False)
 
 
+
 jhon = Movie(title="jaws", year=2011,
              description='When a killer shark unleashes chaos on a beach community off Cape Cod',
              # it's up to a local sheriff, a marine biologist,
@@ -190,13 +191,13 @@ def rate_db():
 
 @app.route("/")
 def home():
-    films = db.session.execute(db.select(Movie).order_by(Movie.title)).scalars()
+    films = db.session.execute(db.select(Movie).order_by(Movie.rating)).scalars()
     var_id = films.all()[2].rating
     print(var_id)
-    movies = [movie1, movie2]
-    # for item in films:
-    #     print("title", item.title)
-    return render_template("index.html", movies=list_of_all_movies, films=films, id=var_id)
+    movies = sorted(list_of_all_movies, key=lambda x: x.rating, reverse=True)
+    for index, movie in enumerate(movies, start=1):
+        movie.index = index
+    return render_template("index.html", movies=movies, films=films, id=var_id)
 
 
 @app.route('/update_rate/<b_name>')

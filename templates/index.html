@@ -11,7 +11,7 @@
             <div class="front"  style='background-image: url({{ movies.img_url }}'>
           <!--        https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.themoviedb.org%2Fmovie%2F1817-phone-booth%2Fimages%2Fposters&psig=AOvVaw1N3D_XA_Q1C7rC-1oXGW6w&ust=1692693866609000&source=images&cd=vfe&opi=89978449&ved=0CA4QjRxqFwoTCLDm6qKu7YADFQAAAAAdAAAAABAE-->
           <!--    <div class="front" style="background-image: url('https://www.shortlist.com/media/images/2019/05/the-30-coolest-alternative-movie-posters-ever-2-1556670563-K61a-column-width-inline.jpg');">-->
-            <p class="large">1111</p>
+            <p class="index">{{ movies.index }}</p>
             </div>
         <div class="back"><div>
 
@@ -31,7 +31,7 @@
 
         </div>
     </div>
-        {% endfor %}
+    {% endfor %}
 <!--        {% for variable in variables %}-->
 <!--            <div class="card">-->
 <!--                This is a div with class "div-class" and variable "{{ variable }}"-->
